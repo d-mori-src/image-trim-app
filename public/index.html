@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+  <title>画像トリミングアプリ</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+</head>
+
+<body>
+  <header>画像トリミングアプリ</header>
+  <main>
+    <div class="upload-wrapper" id="drop-area">
+      <label class="custom-upload">
+        <input type="file" id="upload" accept="image/*" multiple />
+        ファイル選択
+      </label>
+      <p class="upload-filename">
+        ドラッグ＆ドロップ、または、左のファイル選択をクリック
+        <span>※横幅600px以上必須</span>
+      </p>
+    </div>
+
+    <div class="download-all-buttons" style="display: none;">
+      <button id="download-all">すべてトリミングしてダウンロード（個別）</button>
+      <button id="download-zip">すべてトリミングしてダウンロード（zip圧縮）</button>
+    </div>
+
+    <div class="preview-container" id="preview-container"></div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+  <script src="./js/main.js"></script>
+</body>
+
+</html>
