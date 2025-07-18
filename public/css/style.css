@@ -56,6 +56,49 @@ header {
     }
 }
 
+main .custom-size-inputs-wrapper {
+    width: calc(100% - 40px);
+    max-width: 768px;
+    margin: 0 auto 40px;
+}
+@media screen and (max-width: 767px) {
+    main .custom-size-inputs-wrapper {
+        margin: 0 auto 20px;
+    }
+}
+main .custom-size-inputs-wrapper .custom-size-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0 20px;
+    flex-wrap: wrap;
+}
+@media screen and (max-width: 767px) {
+    main .custom-size-inputs-wrapper .custom-size-inputs {
+        gap: 10px 20px;
+    }
+}
+main .custom-size-inputs-wrapper .custom-size-inputs .custom-size-input {
+    display: flex;
+    align-items: center;
+}
+main .custom-size-inputs-wrapper .custom-size-inputs .custom-size-input span {
+    font-size: 1.2rem;
+    font-weight: bold;
+    width: 30px;
+}
+main .custom-size-inputs-wrapper .custom-size-inputs .custom-size-input input {
+    font-size: 1.2rem;
+    line-height: 1.4;
+    padding: 8px 16px;
+    border: 2px solid #ccc;
+    outline: none;
+    border-radius: 4px;
+    background: #eee;
+}
+main .custom-size-inputs-wrapper .caution {
+    font-size: 1.2rem;
+    margin: 8px 0 0 0;
+}
 main .upload-wrapper {
     display: flex;
     align-items: center;
@@ -121,6 +164,11 @@ main .preview-container .preview-item button {
     padding: 10px 20px;
     border-radius: 9999px;
     cursor: pointer;
+}
+main .preview-container .preview-item .original-size {
+    font-size: 1.2rem;
+    color: #333;
+    margin: 0 0 8px 0;
 }
 main .download-all-buttons {
     display: flex;

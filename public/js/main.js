@@ -4,6 +4,46 @@ const dropArea = $('#drop-area');
 const previewContainer = $('#preview-container');
 const downloadButtons = $('.download-all-buttons');
 
+function validateCustomSizeOnBlur() {
+    const width = parseInt($('#custom-width').val(), 10);
+    const height = parseInt($('#custom-height').val(), 10);
+
+    // どちらも未入力や非数値なら無視
+    if (isNaN(width) && isNaN(height)) return;
+
+    // 両方600未満ならアラート
+    if ((isNaN(width) || width < 600) && (isNaN(height) || height < 600)) {
+        alert('幅と高さの両方を600px以上にしてください。どちらか一方でも600px以上であれば許容されます。');
+
+        // 両方クリア
+        $('#custom-width').val('');
+        $('#custom-height').val('');
+    }
+}
+
+$('#custom-width, #custom-height').on('blur', function () {
+    validateCustomSizeOnBlur();
+});
+
+function updateAllCroppersAspectRatio() {
+    const width = parseInt($('#custom-width').val(), 10);
+    const height = parseInt($('#custom-height').val(), 10);
+
+    // 両方とも数値がある場合のみ更新
+    if (!isNaN(width) && !isNaN(height) && width > 0 && height > 0) {
+        const ratio = width / height;
+
+        croppers.forEach(({ cropper }) => {
+            cropper.setAspectRatio(ratio);
+        });
+    }
+}
+
+// 入力されたら即時反映
+$('#custom-width, #custom-height').on('input', function () {
+    updateAllCroppersAspectRatio();
+});
+
 // ドラッグ&ドロップイベント
 dropArea.on('dragover', e => {
     e.preventDefault();
@@ -27,6 +67,11 @@ function handleFiles(files) {
     previewContainer.empty();
     let validImageFound = false;
 
+    const customWidth = parseInt($('#custom-width').val());
+    const customHeight = parseInt($('#custom-height').val());
+    const useCustomSize = customWidth > 0 && customHeight > 0;
+    const aspectRatio = useCustomSize ? customWidth / customHeight : 1200 / 630;
+
     Array.from(files).forEach((file, index) => {
         if (!file.type.startsWith('image/')) return;
 
@@ -39,9 +84,16 @@ function handleFiles(files) {
                     return;
                 }
 
+                if (useCustomSize &&
+                    (customWidth > img.naturalWidth || customHeight > img.naturalHeight)
+                ) {
+                    alert(`${file.name}：入力サイズが元画像より大きいですが続行します`);
+                }
+
                 validImageFound = true;
                 const previewWrapper = $(`
                     <div class="preview-item">
+                    <p class="original-size" id="original-size-${index}"></p>
                         <img id="preview-${index}" />
                     </div>
                 `);
@@ -51,7 +103,9 @@ function handleFiles(files) {
                 previewContainer.append(previewWrapper);
                 $(`#preview-${index}`).attr('src', img.src);
 
-                const cropper = createCropper(`preview-${index}`);
+                $(`#original-size-${index}`).text(`元サイズ：${img.naturalWidth}px × ${img.naturalHeight}px`);
+
+                const cropper = createCropper(`preview-${index}`, aspectRatio);
                 croppers[index] = { cropper, file };
 
                 if (index === files.length - 1) {
@@ -65,9 +119,9 @@ function handleFiles(files) {
 }
 
 // Cropper生成関数
-function createCropper(id) {
+function createCropper(id, aspectRatio) {
     return new Cropper(document.getElementById(id), {
-        aspectRatio: 1200 / 630,
+        aspectRatio,
         viewMode: 1,
         autoCropArea: 1,
     });
@@ -85,9 +139,24 @@ function createCroppedCanvas(cropper, imageElement) {
     const naturalWidth = imageElement.naturalWidth;
     const naturalHeight = imageElement.naturalHeight;
 
-    const shouldResize = naturalWidth >= 1200 && naturalHeight >= 630;
-    const width = shouldResize ? 1200 : naturalWidth;
-    const height = shouldResize ? 630 : Math.round(naturalWidth * (630 / 1200));
+    const inputWidth = parseInt($('#custom-width').val(), 10);
+    const inputHeight = parseInt($('#custom-height').val(), 10);
+
+    const hasCustomSize = !isNaN(inputWidth) && !isNaN(inputHeight);
+
+    const ignoreCustomSize =
+        hasCustomSize && inputWidth === 1200 && inputHeight === 630;
+
+    let width, height;
+
+    if (!hasCustomSize || ignoreCustomSize) {
+        const shouldResize = naturalWidth >= 1200 && naturalHeight >= 630;
+        width = shouldResize ? 1200 : naturalWidth;
+        height = shouldResize ? 630 : Math.round(naturalWidth * (630 / 1200));
+    } else {
+        width = inputWidth;
+        height = inputHeight;
+    }
 
     return cropper.getCroppedCanvas({
         width,
@@ -97,18 +166,18 @@ function createCroppedCanvas(cropper, imageElement) {
     });
 }
 
-// ファイルサイズ（重さ）を200KB未満にする関数
+
+// 画質を変えず、200KB未満に抑える圧縮
 async function compressCanvasToUnderSize(canvas, maxSizeKB = 200, minQuality = 0.6) {
     let quality = 1.0;
-    let blob = await new Promise(resolve =>
-        canvas.toBlob(resolve, 'image/jpeg', quality)
-    );
+    let blob;
 
-    while (blob.size > maxSizeKB * 1024 && quality > minQuality) {
-        quality -= 0.05;
+    while (quality >= minQuality) {
         blob = await new Promise(resolve =>
             canvas.toBlob(resolve, 'image/jpeg', quality)
         );
+        if (blob.size / 1024 <= maxSizeKB) break;
+        quality -= 0.05;
     }
 
     return blob;
@@ -123,13 +192,10 @@ previewContainer.on('click', 'button', async function () {
     const baseName = file.name.replace(/\.[^/.]+$/, '');
 
     const blob = await compressCanvasToUnderSize(canvas);
-    const url = URL.createObjectURL(blob);
-
     const link = document.createElement('a');
-    link.href = url;
+    link.href = URL.createObjectURL(blob);
     link.download = `${baseName}-cropped.jpg`;
     link.click();
-    URL.revokeObjectURL(url);
 });
 
 // 一括ダウンロード（個別）
@@ -138,16 +204,13 @@ $('#download-all').on('click', async () => {
         const { cropper, file } = croppers[index];
         const imageElement = document.getElementById(`preview-${index}`);
         const canvas = createCroppedCanvas(cropper, imageElement);
+        const blob = await compressCanvasToUnderSize(canvas);
         const baseName = file.name.replace(/\.[^/.]+$/, '');
 
-        const blob = await compressCanvasToUnderSize(canvas);
-        const url = URL.createObjectURL(blob);
-
         const link = document.createElement('a');
-        link.href = url;
+        link.href = URL.createObjectURL(blob);
         link.download = `${baseName}-cropped.jpg`;
         link.click();
-        URL.revokeObjectURL(url);
     }
 });
 
@@ -159,9 +222,8 @@ $('#download-zip').on('click', async () => {
         croppers.map(async ({ cropper, file }, index) => {
             const imageElement = document.getElementById(`preview-${index}`);
             const canvas = createCroppedCanvas(cropper, imageElement);
-            const baseName = file.name.replace(/\.[^/.]+$/, '');
-
             const blob = await compressCanvasToUnderSize(canvas);
+            const baseName = file.name.replace(/\.[^/.]+$/, '');
             zip.file(`${baseName}-cropped.jpg`, blob);
         })
     );
