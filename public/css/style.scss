@@ -67,13 +67,74 @@ header {
     height: 100px;
     margin: 0 0 40px 0;
     background: #00be88;
+}
 
-    @include mq() {
-        margin: 0 0 20px 0;
+footer {
+    position: fixed;
+    left: 50%;
+    bottom: 20px;
+    transform: translateX(-50%);
+
+    p {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-size: 1rem;
+        color: #666;
+
+        span {
+            font-size: 1rem;
+        }
+
+        .c-text {
+            font-size: 1.6rem;
+        }
     }
 }
 
 main {
+    .login-area {
+        width: calc(100% - 80px);
+        max-width: 240px;
+        margin-inline: auto;
+
+        .input-area {
+            margin: 0 0 10px 0;
+
+            label {
+                display: block;
+                font-size: 1.2rem;
+                font-weight: bold;
+                margin: 0 0 5px 0;
+            }
+
+            input {
+                font-size: 1.2rem;
+                line-height: 1.4;
+                width: 100%;
+                padding: 12px 14px 10px;
+                border: none;
+                outline: none;
+                border-bottom: 1px solid #ccc;
+                background: #effefa;
+                transition: .5s;
+
+                &:focus {
+                    border-bottom: 1px solid #00be88;
+                }
+            }
+        }
+
+
+        .login-error {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ff0000;
+            margin: 20px 0 0 0;
+        }
+    }
+
     .custom-size-inputs-wrapper {
         width: calc(100% - 40px);
         max-width: 768px;
@@ -222,6 +283,26 @@ main {
             &:last-child {
                 background: #cc0066;
             }
+        }
+    }
+
+    .login-button,
+    .logout-button {
+        display: block;
+        font-size: 1.2rem;
+        font-weight: bold;
+        color: #fff;
+        width: 160px;
+        margin: 20px auto;
+        padding: 6px;
+        border-radius: 9999px;
+        border: 1px solid#00be88;
+        background: #00be88;
+        transition: .5s;
+
+        &:hover {
+            color: #00be88;
+            background: #fff;
         }
     }
 }

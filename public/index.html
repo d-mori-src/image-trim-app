@@ -15,40 +15,69 @@
 <body>
   <header>きりとりくん</header>
   <main>
-    <div class="custom-size-inputs-wrapper">
-      <ul class="custom-size-inputs">
-        <li class="custom-size-input">
-          <span>幅</span><input type="number" id="custom-width" placeholder="例（数値のみ）: 800" min="600" />
-        </li>
-        <li class="custom-size-input">
-          <span>高さ</span><input type="number" id="custom-height" placeholder="例（数値のみ）: 600" min="600" />
-        </li>
-      </ul>
-      <p class="caution">※入力されなければ1200×630pxの大きさ（比率）になります</p>
+    <div id="login-area" class="login-area">
+      <div class="input-area">
+        <label>ユーザー名</label>
+        <input type="text" id="login-username" placeholder="ユーザー名">
+      </div>
+      <div class="input-area">
+        <label>パスワード</label>
+        <input type="password" id="login-password" placeholder="パスワード">
+      </div>
+      <button id="login-button" class="login-button">ログイン</button>
+      <p id="login-error" class="login-error"></p>
     </div>
 
-    <div class="upload-wrapper" id="drop-area">
-      <label class="custom-upload">
-        <input type="file" id="upload" accept="image/*" multiple />
-        ファイル選択
-      </label>
-      <p class="upload-filename">
-        ドラッグ＆ドロップ、または、左のファイル選択をクリック
-        <span>※横幅600px以上必須</span>
-      </p>
-    </div>
+    <div id="app-area" style="display: none;">
+      <div class="custom-size-inputs-wrapper">
+        <ul class="custom-size-inputs">
+          <li class="custom-size-input">
+            <span>幅</span><input type="number" id="custom-width" placeholder="例（数値のみ）: 800" min="600" />
+          </li>
+          <li class="custom-size-input">
+            <span>高さ</span><input type="number" id="custom-height" placeholder="例（数値のみ）: 600" min="600" />
+          </li>
+        </ul>
+        <p class="caution">※入力されなければ1200×630pxの大きさ（比率）になります</p>
+      </div>
 
-    <div class="download-all-buttons" style="display: none;">
-      <button id="download-all">すべてトリミングしてダウンロード（個別）</button>
-      <button id="download-zip">すべてトリミングしてダウンロード（ZIP圧縮）</button>
-    </div>
+      <div class="upload-wrapper" id="drop-area">
+        <label class="custom-upload">
+          <input type="file" id="upload" accept="image/*" multiple />
+          ファイル選択
+        </label>
+        <p class="upload-filename">
+          ドラッグ＆ドロップ、または、左のファイル選択をクリック
+          <span>※横幅600px以上必須</span>
+        </p>
+      </div>
 
-    <div class="preview-container" id="preview-container"></div>
+      <div class="download-all-buttons" style="display: none;">
+        <button id="download-all">すべてトリミングしてダウンロード（個別）</button>
+        <button id="download-zip">すべてトリミングしてダウンロード（ZIP圧縮）</button>
+      </div>
+
+      <div class="preview-container" id="preview-container"></div>
+
+      <button id="logout-button" class="logout-button">ログアウト</button>
+    </div>
   </main>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
   <script src="./js/main.js"></script>
+  <script src="./js/login.js"></script>
+
+  <footer>
+    <p>
+      <span class="c-text">©</span><span id="current-year"></span> 株式会社SRC | きりとりくん All Rights Reserved.
+    </p>
+
+    <script>
+      document.getElementById("current-year").textContent = new Date().getFullYear();
+    </script>
+  </footer>
 </body>
 
 </html>
