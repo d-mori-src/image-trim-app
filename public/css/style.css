@@ -52,6 +52,7 @@ header {
 }
 
 footer {
+    width: 100%;
     position: fixed;
     left: 50%;
     bottom: 20px;
