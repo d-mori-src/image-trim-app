@@ -53,10 +53,6 @@ header {
 
 footer {
     width: 100%;
-    position: fixed;
-    left: 50%;
-    bottom: 20px;
-    transform: translateX(-50%);
 }
 footer p {
     display: flex;
